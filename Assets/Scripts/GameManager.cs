@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,17 +22,18 @@ public class GameManager : MonoBehaviour
     {
         mathQuestion = GameObject.Find("MathQuestion").GetComponent<TextMeshProUGUI>();
         mathQuestion.text = "";
-        operators = new List<string>();
-        operators.Add("+");
-        operators.Add("-");
-        operators.Add("*");
-        operators.Add("/");   
+        operators = new List<string>
+        {
+            "+",
+            "-",
+            "*",
+            "/"
+        };
     }
 
     // Update is called once per frame
     void Update()
     {
-
         if(GameObject.FindGameObjectsWithTag("Enemy").Length == 0){
             spawnEnemies();
         }
@@ -39,8 +42,8 @@ public class GameManager : MonoBehaviour
 
     void spawnEnemies(){
         hasRightAnswer = false;
-        for (int i = 0; i<level; i++){
-            var e = Instantiate(enemy,enemy.transform.position + new UnityEngine.Vector3(getXpos(),0,0),enemy.transform.rotation);
+        for (int i = 0; i<level; i++){ // enemy.transform.position + new UnityEngine.Vector3(getXpos(),0,0)
+            var e = Instantiate(enemy,randomPos(),enemy.transform.rotation);
             var enemyScript = e.GetComponent<EnemyScript>();
             
             if (!hasRightAnswer){
@@ -48,6 +51,7 @@ public class GameManager : MonoBehaviour
                 float c = RandomMathProblem();
                 answer = c;
                 enemyScript.answer = c;
+                
             } else {
                 enemyScript.hasRightAnswer = false;
                 float c = RandomMathProblem();
@@ -55,6 +59,7 @@ public class GameManager : MonoBehaviour
                     c = RandomMathProblem();
                 }
                 enemyScript.answer = c;
+               
             }
             
         }
@@ -70,6 +75,12 @@ public class GameManager : MonoBehaviour
 
     private float getXpos(){
         return Random.Range(-5.0f,15.0f);
+    }
+    private float getZpos(){
+        return Random.Range(40.0f,50.0f);
+    }
+    private Vector3 randomPos(){
+        return new Vector3(getXpos(),0,getZpos());
     }
     //this function generates a random math p
     // problem also return the right answer
