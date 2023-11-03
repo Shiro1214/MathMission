@@ -5,21 +5,34 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public GameObject enemy;
-    private int level = 5;
+    public int level = 2;
     public float MathLevel = 10.0f;
     private float a,b;
     private TextMeshProUGUI mathQuestion;
+    private TextMeshProUGUI TimerText;
+    public float time = 10.0f;
     private bool hasRightAnswer;
     private List<string> operators;
     private float answer;
     private int curOper;
+    public bool isGameActive = true;
+    private AudioSource backgroundMusic;
     // Start is called before the first frame update
     void Start()
     {
+        if (GameSettings.Instance != null)
+        {
+            MathLevel = GameSettings.Instance.mathLevel;
+            time = GameSettings.Instance.timer;
+        }
+        backgroundMusic = GameObject.Find("Main Camera").GetComponent<AudioSource>();
+        TimerText = GameObject.Find("Timer").GetComponent<TextMeshProUGUI>();
+        TimerText.text = "Time: " + ((int)GameSettings.Instance.timer).ToString();
         mathQuestion = GameObject.Find("MathQuestion").GetComponent<TextMeshProUGUI>();
         mathQuestion.text = "";
         operators = new List<string>
@@ -30,14 +43,47 @@ public class GameManager : MonoBehaviour
             "/"
         };
     }
-
+    
     // Update is called once per frame
     void Update()
     {
-        if(GameObject.FindGameObjectsWithTag("Enemy").Length == 0){
-            spawnEnemies();
+        if (isGameActive){
+            time -= Time.deltaTime;
+            if (time <= 0){
+                GameOver();
+            }
+            TimerText.text = "Time: " + ((int)time).ToString();
+            
+            if(GameObject.FindGameObjectsWithTag("Enemy").Length == 0){
+                spawnEnemies();
+                level++;
+            }
+            
         }
-        mathQuestion.text = "" + a + " " + operators[curOper] + " " + b + " = ?";
+
+    }
+    public void GameOver(){
+        isGameActive = false;
+        //Invoke("goNext", 2.0f);
+        StartCoroutine(FadeOut(backgroundMusic, 2f));
+    }
+    void goNext(){
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+    IEnumerator FadeOut(AudioSource audioSource, float fadeTime)
+{
+    float startVolume = audioSource.volume;
+
+    while (audioSource.volume > 0)
+    {
+        audioSource.volume -= startVolume * Time.deltaTime / fadeTime;
+
+        yield return null;
+    }
+
+    audioSource.Stop();
+    audioSource.volume = startVolume;
+    goNext();
     }
 
     void spawnEnemies(){
@@ -51,6 +97,7 @@ public class GameManager : MonoBehaviour
                 float c = RandomMathProblem();
                 answer = c;
                 enemyScript.answer = c;
+                mathQuestion.text = "" + a + " " + operators[curOper] + " " + b + " = ?";
                 
             } else {
                 enemyScript.hasRightAnswer = false;
@@ -102,6 +149,7 @@ public class GameManager : MonoBehaviour
                 case "/": c = a / b; break;
             }
             hasRightAnswer = true;
+            
         }
         else{
             var a = Random.Range(1, MathLevel);

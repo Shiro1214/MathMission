@@ -39,6 +39,7 @@ public class EnemyScript : MonoBehaviour
         particleObj = transform.Find("Explosion_Purple").gameObject.GetComponent<ParticleSystem>();
         entranceCollider = entrance.GetComponent<Collider>();
         entrancePos = entrance.transform.position  + randomEntranceOffset();
+        speedForce = GameSettings.Instance.enemySpeed;
     }
 
 
@@ -55,10 +56,12 @@ public class EnemyScript : MonoBehaviour
         if (setAnswer==false){
             textUi.text = answer.ToString();
         }
-        
-        var direction = entrancePos - transform.position;
-        direction = direction.normalized;
-        enemyRb.AddForce(direction * speedForce * Time.deltaTime);
+        if (gm.isGameActive){
+            var direction = entrancePos - transform.position;
+            direction = direction.normalized;
+            enemyRb.AddForce(direction * speedForce * Time.deltaTime);
+        }
+
        
     }
     private Vector3 randomEntranceOffset(){
@@ -66,18 +69,20 @@ public class EnemyScript : MonoBehaviour
     }
     private void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject == entrance){
+        if (gm.isGameActive){
+            if (other.gameObject == entrance){
                 if (hasRightAnswer) {
-                scoreUI.score -= 10;
-                enemyIn.score += 1;
-                scoreUI.textMesh.text = "Score: " + scoreUI.score.ToString();
-                enemyIn.textMesh.text = "Enemy in: " + enemyIn.score.ToString();
+                GameSettings.Instance.score -= 10;
+                GameSettings.Instance.enemyIn += 1;
+            
+                scoreUI.textMesh.text = "Score: " + GameSettings.Instance.score.ToString();
+                enemyIn.textMesh.text = "Enemy in: " + GameSettings.Instance.enemyIn.ToString();
                 gm.clearEnemies();
             }
             Destroy(gameObject);
-        }
-        if (other.gameObject.CompareTag("Shuriken") && !isHit)
-        {
+            }
+            if (other.gameObject.CompareTag("Shuriken") && !isHit)
+            {
             //explosionParticle.Play();
             isHit = true;
             particleObj.Play();
@@ -87,18 +92,23 @@ public class EnemyScript : MonoBehaviour
             if (hasRightAnswer){
 
                 audioSource.PlayOneShot(correctSound);
-                scoreUI.score += 10;
-                scoreUI.textMesh.text = "Score: " + scoreUI.score.ToString();
+                GameSettings.Instance.score += 10;
+                if (GameSettings.Instance.frugality){
+                    GameSettings.Instance.score += 1;
+                }
+                scoreUI.textMesh.text = "Score: " + GameSettings.Instance.score.ToString();
                 Destroy(gameObject, correctSound.length + 0.1f);
                 gm.clearEnemies();
             } else 
             {
                 audioSource.PlayOneShot(incorrectSound);
-                scoreUI.score -= 10;
-                scoreUI.textMesh.text = "Score: " + scoreUI.score.ToString();
+                GameSettings.Instance.score -= 10;
+                scoreUI.textMesh.text = "Score: " + GameSettings.Instance.score.ToString();
                 Destroy(gameObject, incorrectSound.length + 0.1f);
             }
+            }
         }
+        
     }
 
 
