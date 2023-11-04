@@ -22,15 +22,20 @@ public class GameManager : MonoBehaviour
     private int curOper;
     public bool isGameActive = true;
     private AudioSource backgroundMusic;
+
+    public GameObject levelComplete;
+    bool musicFadeIn = false;
     // Start is called before the first frame update
     void Start()
     {
+
         if (GameSettings.Instance != null)
         {
             MathLevel = GameSettings.Instance.mathLevel;
             time = GameSettings.Instance.timer;
         }
         backgroundMusic = GameObject.Find("Main Camera").GetComponent<AudioSource>();
+        
         TimerText = GameObject.Find("Timer").GetComponent<TextMeshProUGUI>();
         TimerText.text = "Time: " + ((int)GameSettings.Instance.timer).ToString();
         mathQuestion = GameObject.Find("MathQuestion").GetComponent<TextMeshProUGUI>();
@@ -42,6 +47,8 @@ public class GameManager : MonoBehaviour
             "*",
             "/"
         };
+        StartCoroutine(FadeIn(backgroundMusic, 2f));
+
     }
     
     // Update is called once per frame
@@ -65,6 +72,7 @@ public class GameManager : MonoBehaviour
     public void GameOver(){
         isGameActive = false;
         //Invoke("goNext", 2.0f);
+        levelComplete.SetActive(true);
         StartCoroutine(FadeOut(backgroundMusic, 2f));
     }
     void goNext(){
@@ -80,10 +88,17 @@ public class GameManager : MonoBehaviour
 
         yield return null;
     }
-
     audioSource.Stop();
     audioSource.volume = startVolume;
     goNext();
+    }
+    IEnumerator FadeIn(AudioSource audioSource, float fadeTime)
+    {
+        
+        while (audioSource.volume < 0.25f){
+            audioSource.volume +=  0.25f * Time.deltaTime / fadeTime;
+            yield return null;
+        }
     }
 
     void spawnEnemies(){
