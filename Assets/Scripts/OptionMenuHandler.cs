@@ -1,11 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using Unity.VisualScripting;
-using System;
-using OpenCover.Framework.Model;
 public class OptionMenuHandler : MonoBehaviour
 {
     //TMPro.TMP_Dropdown dropdown
@@ -72,6 +67,9 @@ public class OptionMenuHandler : MonoBehaviour
 
     public void SaveGameSetting(){
         GameSettings.Instance.SaveSetting();
+    }
+    public void ResetScore(){
+        GameSettings.Instance.resetScore();
     }
     public void LoadGameSetting(){
         GameSettings.Instance.LoadSetting();

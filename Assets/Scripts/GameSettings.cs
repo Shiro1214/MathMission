@@ -65,8 +65,13 @@ public class GameSettings : MonoBehaviour
             HighestScore data = JsonUtility.FromJson<HighestScore>(json);
             highScore = data.highScore;
             return true;
-        } 
+        }
         return false;
+    }
+    public void resetScore(){
+        score = 0;
+        SaveHighestScore();
+        LoadHighestScore();
     }
     public void SaveSetting () {
         PlayerSettings data = new PlayerSettings();
@@ -84,13 +89,13 @@ public class GameSettings : MonoBehaviour
         if (File.Exists(path))
         {
             string json = File.ReadAllText(path);
-            Debug.Log(json);
+            //Debug.Log(json);
             PlayerSettings data = JsonUtility.FromJson<PlayerSettings>(json);
             enemySpeed = data.enemySpeed;
             mathLevel = data.mathLevel;
             timer = data.timer;
             frugality = data.frugality;
-            Debug.Log(frugality);
+           // Debug.Log(frugality);
         } else {
             timer = 60.0f;
             enemySpeed = 150;
@@ -99,6 +104,8 @@ public class GameSettings : MonoBehaviour
             SaveSetting();
         }
     }
+
+    
 
 
 }

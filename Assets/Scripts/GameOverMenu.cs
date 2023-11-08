@@ -11,30 +11,27 @@ public class GameOverMenu : MonoBehaviour
 {
     private TextMeshProUGUI yourScore;
     private TextMeshProUGUI newRecord;
+    private TextMeshProUGUI bestScore;
     // Start is called before the first frame update
     void Start()
     {
         yourScore = GameObject.Find("YourScore").GetComponent<TextMeshProUGUI>();
         newRecord = GameObject.Find("NewRecord").GetComponent<TextMeshProUGUI>();
+        bestScore = GameObject.Find("BestScore").GetComponent<TextMeshProUGUI>();
         yourScore.text = "Your Score : " + GameSettings.Instance.score.ToString();
-        //Debug.Log("Your score: " + GameSettings.Instance.score);
+        bestScore.text = "Highest Score : " + GameSettings.Instance.highScore.ToString();
         if (GameSettings.Instance.LoadHighestScore()){
             if (GameSettings.Instance.score > GameSettings.Instance.highScore){
                 GameSettings.Instance.SaveHighestScore();
-                newRecord.text = "New Record! compared to " + GameSettings.Instance.highScore.ToString();
-                //Debug.Log("Previous High Score: " + GameSettings.Instance.highScore);
-                //Debug.Log("New High Score Unlocked!  ");
+                newRecord.text = "Congrats! New score unlocked!";
             }
         }else {
             GameSettings.Instance.SaveHighestScore();
+            newRecord.text = "First Best Record!";
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
     public void Restart() {
         GameSettings.ResetState();
         SceneManager.LoadScene(1);

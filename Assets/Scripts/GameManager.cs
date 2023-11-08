@@ -24,7 +24,6 @@ public class GameManager : MonoBehaviour
     private AudioSource backgroundMusic;
 
     public GameObject levelComplete;
-    bool musicFadeIn = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -91,6 +90,7 @@ public class GameManager : MonoBehaviour
     audioSource.Stop();
     audioSource.volume = startVolume;
     goNext();
+    
     }
     IEnumerator FadeIn(AudioSource audioSource, float fadeTime)
     {
